@@ -1,6 +1,7 @@
 package com.yusuforhan.android.notesapp.presentation.home
 
 import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,11 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.yusuforhan.android.notesapp.common.util.showToast
+import com.yusuforhan.android.notesapp.R
 import com.yusuforhan.android.notesapp.data.model.Note
 import com.yusuforhan.android.notesapp.presentation.home.viewmodel.HomeEvent
 import com.yusuforhan.android.notesapp.presentation.home.viewmodel.HomeState
@@ -55,7 +57,7 @@ fun HomeRoute(
 fun HomeScreen(
     context: Context = LocalContext.current,
     navigateToAddScreen: () -> Unit, state: HomeState, modifier: Modifier = Modifier,
-    onEvent : (HomeEvent) -> Unit
+    onEvent: (HomeEvent) -> Unit
 
 ) {
     Scaffold(modifier = modifier, topBar = {
@@ -82,9 +84,13 @@ fun HomeScreen(
                 .background(DarkGray)
         ) {
             if (state.isEmpty == true) {
-                showToast(context = context, msg = "There is not a saved note.")
+                Image(
+                    painter = painterResource(id = R.drawable.emptyimage),
+                    contentDescription = null,
+                    modifier = modifier.align(Alignment.Center)
+                )
             } else {
-                NoteList(noteList = state.notes){ note ->
+                NoteList(noteList = state.notes) { note ->
                     onEvent(HomeEvent.Delete(note))
                 }
             }
@@ -96,13 +102,13 @@ fun HomeScreen(
 fun NoteList(
     noteList: MutableList<Note>,
     modifier: Modifier = Modifier,
-    deleteClick : (Note) -> Unit
+    deleteClick: (Note) -> Unit
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
         items(noteList) {
-            NoteItem(note = it){note ->
+            NoteItem(note = it) { note ->
                 deleteClick(note)
             }
         }
@@ -112,7 +118,7 @@ fun NoteList(
 @Composable
 fun NoteItem(
     note: Note, modifier: Modifier = Modifier,
-    deleteClick : (Note) -> Unit
+    deleteClick: (Note) -> Unit
 ) {
     Card(
         modifier = modifier
@@ -120,8 +126,10 @@ fun NoteItem(
             .padding(horizontal = 16.dp, vertical = 5.dp),
         colors = CardDefaults.cardColors(containerColor = Color(note.color))
     ) {
-        Box (modifier = modifier
-            .fillMaxSize()){
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+        ) {
             Column {
                 Text(
                     modifier = modifier.padding(5.dp),
@@ -129,16 +137,19 @@ fun NoteItem(
                     style = TextStyle(fontSize = 18.sp)
                 )
                 Text(
-                    modifier = modifier.padding(5.dp),
+                    modifier = modifier.padding(start = 5.dp, top = 5.dp, bottom = 5.dp, end = 18.dp),
                     text = note.body,
                     style = TextStyle(fontSize = 15.sp)
                 )
             }
 
-            Icon(imageVector = Icons.Default.Delete, contentDescription = null, tint = Color.White, modifier = modifier
-                .align(Alignment.CenterEnd)
-                .padding(5.dp)
-                .clickable { deleteClick(note) })
+            Icon(imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(5.dp)
+                    .clickable { deleteClick(note) })
         }
     }
 }
